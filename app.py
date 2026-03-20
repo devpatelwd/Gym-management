@@ -5,10 +5,11 @@ from datetime import date , timedelta
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
+import os
 load_dotenv()
 init_db()
 
-client = genai.Client()
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 st.title("Kailash Gym")
 
