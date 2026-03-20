@@ -1,12 +1,12 @@
 import streamlit as st
-from database import add_member , fetch_all_members , get_expiring_soon , update_payment_status , run_query
+from database import add_member , fetch_all_members , get_expiring_soon , update_payment_status , run_query , init_db
 import pandas as pd
 from datetime import date , timedelta
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
 load_dotenv()
-
+init_db()
 
 client = genai.Client()
 
