@@ -1,22 +1,27 @@
-import sqlite3
 from datetime import date , timedelta
+import psycopg2
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
+def get_connection():
+    return psycopg2.connect(os.getenv("DATABASE_URL"))
 
 def init_db():
 
-    conn = sqlite3.connect("kailash_gym.db")
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
                 CREATE TABLE IF NOT EXISTS members (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    id SERIAL PRIMARY KEY,
                     name TEXT NOT NULL,
                     phone TEXT NOT NULL,
-                    gender TEXT NULL,
-                    joining_date TEXT NULL,
-                    subs_end_date TEXT NULL,
-                    plan TEXT NULL,
-                    status TEXT NULL
+                    gender TEXT ,
+                    joining_date TEXT ,
+                    subs_end_date TEXT ,
+                    plan TEXT ,
+                    status TEXT 
                 )
                    
                 """
@@ -28,20 +33,18 @@ def init_db():
 
 def add_member(name , phone , gender , joining_date , subs_end_date , plan , status):
 
-    conn = sqlite3.connect("kailash_gym.db")
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-                    INSERT INTO members (name , phone , gender , joining_date , subs_end_date , plan , status) VALUES ( ? , ? , ? , ? , ? , ? , ?)
+                    INSERT INTO members (name , phone , gender , joining_date , subs_end_date , plan , status) VALUES ( %s , %s , %s , %s , %s , %s , %s)
                    """,(name , phone , gender , joining_date , subs_end_date , plan , status)
     )
     conn.commit()
     conn.close()
 
-# add_member("dev" , "8282828" , "male" , "2026-03-10" , "2026-03-22" , "3 months" , "paid")
-
 def fetch_all_members():
-    conn = sqlite3.connect("kailash_gym.db")
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("SELECT * FROM members")
@@ -54,7 +57,7 @@ def fetch_all_members():
 
 def get_expiring_soon():
 
-    conn = sqlite3.connect("kailash_gym.db")
+    conn = get_connection()
     cursor = conn.cursor()
 
     today = date.today()
@@ -63,7 +66,7 @@ def get_expiring_soon():
     today_str = today.strftime("%Y-%m-%d")
     ten_days_later_str = ten_days_later.strftime("%Y-%m-%d")
 
-    cursor.execute("SELECT * FROM members WHERE subs_end_date BETWEEN ? AND ?" , (today_str , ten_days_later_str))
+    cursor.execute("SELECT * FROM members WHERE subs_end_date BETWEEN %s AND %s" , (today_str , ten_days_later_str))
 
     members = cursor.fetchall()
 
@@ -72,16 +75,16 @@ def get_expiring_soon():
     return members
 
 def update_payment_status(member_id , status):
-    conn = sqlite3.connect("kailash_gym.db")
+    conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("UPDATE members SET status = ? WHERE id = ? " , (status , member_id))
+    cursor.execute("UPDATE members SET status = %s WHERE id = %s " , (status , member_id))
 
     conn.commit()
     conn.close()
 
 def run_query(sql):
-    conn = sqlite3.connect("kailash_gym.db")
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(sql)
     result = cursor.fetchall()
@@ -90,34 +93,33 @@ def run_query(sql):
     return result
 
 def delete_member(member_id):
-    conn = sqlite3.connect("kailash_gym.db")
+    conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM members WHERE id = ?" , (member_id , ))
+    cursor.execute("DELETE FROM members WHERE id = %s" , (member_id , ))
     conn.commit()
     conn.close()
 
 def update_member(name , phone , gender , joining_date , subs_end_date , plan , status , member_id):
-    conn = sqlite3.connect("kailash_gym.db")
+    conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("UPDATE members SET name = ? , phone = ? , gender = ? , joining_date = ? , subs_end_date = ? , plan = ? , status = ? WHERE id = ?" , (name , phone , gender , joining_date , subs_end_date , plan , status , member_id ) )
+    cursor.execute("UPDATE members SET name = %s , phone = %s , gender = %s , joining_date = %s , subs_end_date = %s , plan = %s , status = %s WHERE id = %s" , (name , phone , gender , joining_date , subs_end_date , plan , status , member_id ) )
     conn.commit()
     conn.close()
 
 def member_by_id(memberid):
-    conn = sqlite3.connect("kailash_gym.db")
+    conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM members WHERE id = ? " , (memberid ,))
+    cursor.execute("SELECT * FROM members WHERE id = %s " , (memberid ,))
     member = cursor.fetchone()
     conn.close()
     return member
 
 def get_all_unpaid():
     status = "Unpaid"
-    conn = sqlite3.connect("kailash_gym.db")
+    conn =get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM members WHERE STATUS = ?" , (status ,))
+    cursor.execute("SELECT * FROM members WHERE STATUS = %s" , (status ,))
 
     members = cursor.fetchall()
     conn.close()
     return members
-
