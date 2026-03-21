@@ -64,6 +64,7 @@ else:
             st.warning(f"{len(expiring_plan_members)} members plan expires soon !" ,icon="⚠️")
         checkbox = st.checkbox("Get all Expiring Plan Members ")
         checkbox2 = st.checkbox("Get all Fees UNPAID Members")
+        checkbox3 = st.checkbox("Get all members having Due Amount")
 
         if checkbox:
             df = pd.DataFrame(expiring_plan_members , columns=["ID" , "Name" , "Phone" , "Gender" , "Joining Date" , "End Date" , "Plan" , "Status" , "Plan Amount" , "Amount Paid"])
@@ -78,6 +79,11 @@ else:
             style_df = df.style.map(color_status ,subset=["Status"])
 
             st.dataframe(style_df , hide_index=True)
+        elif checkbox3:
+            df = pd.DataFrame(all_members , columns=["ID" , "Name" , "Phone" , "Gender" , "Joining Date" , "End Date" , "Plan" , "Status" , "Plan Amount" , "Amount Paid"])
+            df["Amount Due"] = df["Plan Amount"] - df["Amount Paid"]
+            df = df[df["Amount Due"] > 0]
+            st.dataframe(df[["Name" , "Amount Due"]] , hide_index= True) 
 
         else:
             df = pd.DataFrame(all_members , columns=["ID" , "Name" , "Phone" , "Gender" , "Joining Date" , "End Date" , "Plan" , "Status" , "Plan Amount" , "Amount Paid"])
@@ -226,7 +232,7 @@ else:
             col1.metric("Members Joined", len(members_in_range))
             col2.metric("Total Revenue", f"₹{total_revenue_ or 0}")
 
-            
+
             df = pd.DataFrame(members_in_range , columns= ["ID" , "Name" , "Phone" , "Gender" , "Joining Date" , "End Date" , "Plan" , "Status" , "Plan Amount" , "Amount Paid"])
             chart_data = df.groupby("Joining Date").size().reset_index(name="Members")
             st.line_chart(chart_data.set_index("Joining Date"))
