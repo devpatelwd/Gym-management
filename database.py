@@ -89,4 +89,35 @@ def run_query(sql):
 
     return result
 
+def delete_member(member_id):
+    conn = sqlite3.connect("kailash_gym.db")
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM members WHERE id = ?" , (member_id , ))
+    conn.commit()
+    conn.close()
+
+def update_member(name , phone , gender , joining_date , subs_end_date , plan , status , member_id):
+    conn = sqlite3.connect("kailash_gym.db")
+    cursor = conn.cursor()
+    cursor.execute("UPDATE members SET name = ? , phone = ? , gender = ? , joining_date = ? , subs_end_date = ? , plan = ? , status = ? WHERE id = ?" , (name , phone , gender , joining_date , subs_end_date , plan , status , member_id ) )
+    conn.commit()
+    conn.close()
+
+def member_by_id(memberid):
+    conn = sqlite3.connect("kailash_gym.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM members WHERE id = ? " , (memberid ,))
+    member = cursor.fetchone()
+    conn.close()
+    return member
+
+def get_all_unpaid():
+    status = "Unpaid"
+    conn = sqlite3.connect("kailash_gym.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM members WHERE STATUS = ?" , (status ,))
+
+    members = cursor.fetchall()
+    conn.close()
+    return members
 
