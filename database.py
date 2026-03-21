@@ -31,14 +31,14 @@ def init_db():
     conn.close()
 
 
-def add_member(name , phone , gender , joining_date , subs_end_date , plan , status):
+def add_member(name , phone , gender , joining_date , subs_end_date , plan , status , plan_amount , amount_paid):
 
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-                    INSERT INTO members (name , phone , gender , joining_date , subs_end_date , plan , status) VALUES ( %s , %s , %s , %s , %s , %s , %s)
-                   """,(name , phone , gender , joining_date , subs_end_date , plan , status)
+                    INSERT INTO members (name , phone , gender , joining_date , subs_end_date , plan , status , plan_amount , amount_paid) VALUES ( %s , %s , %s , %s , %s , %s , %s , %s , %s)
+                   """,(name , phone , gender , joining_date , subs_end_date , plan , status , plan_amount , amount_paid)
     )
     conn.commit()
     conn.close()
@@ -78,7 +78,7 @@ def update_payment_status(member_id , status):
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("UPDATE members SET status = %s WHERE id = %s " , (status , member_id))
+    cursor.execute("UPDATE members SET status = %s  WHERE id = %s " , (status , member_id))
 
     conn.commit()
     conn.close()
@@ -99,10 +99,10 @@ def delete_member(member_id):
     conn.commit()
     conn.close()
 
-def update_member(name , phone , gender , joining_date , subs_end_date , plan , status , member_id):
+def update_member(name , phone , gender , joining_date , subs_end_date , plan , status , plan_amount , amount_paid , member_id):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("UPDATE members SET name = %s , phone = %s , gender = %s , joining_date = %s , subs_end_date = %s , plan = %s , status = %s WHERE id = %s" , (name , phone , gender , joining_date , subs_end_date , plan , status , member_id ) )
+    cursor.execute("UPDATE members SET name = %s , phone = %s , gender = %s , joining_date = %s , subs_end_date = %s , plan = %s , status = %s , plan_amount = %s , amount_paid = %s WHERE id = %s" , (name , phone , gender , joining_date , subs_end_date , plan , status, plan_amount , amount_paid , member_id ) )
     conn.commit()
     conn.close()
 
@@ -123,3 +123,22 @@ def get_all_unpaid():
     members = cursor.fetchall()
     conn.close()
     return members
+
+def get_members_by_date(start_date , end_date):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * from members  WHERE joining_date BETWEEN  %s AND %s" , (start_date , end_date))
+    all_members = cursor.fetchall()
+    conn.close()
+    return all_members
+
+def total_revenue(start_date , end_date):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT SUM(amount_paid) FROM members  WHERE joining_date BETWEEN %s AND %s" , (start_date , end_date))
+    all_members = cursor.fetchone()[0]
+    conn.close()
+    return all_members
+
