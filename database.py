@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def get_connection():
-    return psycopg2.connect(os.getenv("DATABASE_URL"))
+        return psycopg2.connect(os.getenv("DATABASE_URL"))
 
 def init_db():
 
@@ -29,6 +29,7 @@ def init_db():
     
     conn.commit()
     conn.close()
+    
 
 
 def add_member(name , phone , gender , joining_date , subs_end_date , plan , status , plan_amount , amount_paid):
@@ -52,7 +53,6 @@ def fetch_all_members():
     members = cursor.fetchall()
 
     conn.close()
-
     return members
 
 def get_expiring_soon():
@@ -69,9 +69,7 @@ def get_expiring_soon():
     cursor.execute("SELECT * FROM members WHERE subs_end_date BETWEEN %s AND %s" , (today_str , ten_days_later_str))
 
     members = cursor.fetchall()
-
     conn.close()
-
     return members
 
 def update_payment_status(member_id , status):
@@ -88,8 +86,8 @@ def run_query(sql):
     cursor = conn.cursor()
     cursor.execute(sql)
     result = cursor.fetchall()
+    
     conn.close()
-
     return result
 
 def delete_member(member_id):
@@ -141,4 +139,3 @@ def total_revenue(start_date , end_date):
     all_members = cursor.fetchone()[0]
     conn.close()
     return all_members
-

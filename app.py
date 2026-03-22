@@ -40,7 +40,11 @@ else:
             "1 Month PT" : 3000 
         }
     
-    st.title("Kailash Gym")
+    st.logo("static/logo.png")
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.image("static/logo.png", width=200)
+        st.title("Kailash Gym")
 
     page = st.sidebar.selectbox(
         "Options",
@@ -174,7 +178,9 @@ else:
 
             try:
                 results = run_query(response)
-                st.dataframe(pd.DataFrame(results , columns=["ID" , "Name" , "Phone" , "Gender" , "Joining Date" , "End date" , "Plan" , "Status" , "Plan Amount" , "Amount Paid"]))
+                df = pd.DataFrame(results , columns=["ID" , "Name" , "Phone" , "Gender" , "Joining Date" , "End date" , "Plan" , "Status" , "Plan Amount" , "Amount Paid"])
+                style_df = df.style.map(color_status , subset=["Status"])
+                st.dataframe(style_df , hide_index=True)
             except :
                 st.error("Could not understood the query , please try rephrasing the question ! ")
 
@@ -228,12 +234,16 @@ else:
             members_in_range = get_members_by_date(start_date , end_date)
             total_revenue_ = total_revenue(start_date , end_date)
 
-            col1, col2 = st.columns(2)
+            df = pd.DataFrame(members_in_range , columns= ["ID" , "Name" , "Phone" , "Gender" , "Joining Date" , "End Date" , "Plan" , "Status" , "Plan Amount" , "Amount Paid"])
+            df["Amount Due"] = df["Plan Amount"] - df["Amount Paid"]
+            total_due = df["Amount Due"].sum()
+            col1, col2 , col3 = st.columns(3)
             col1.metric("Members Joined", len(members_in_range))
             col2.metric("Total Revenue", f"₹{total_revenue_ or 0}")
+            col3.metric("Total Due" , f"₹{max(0 ,total_due)}" )
 
 
-            df = pd.DataFrame(members_in_range , columns= ["ID" , "Name" , "Phone" , "Gender" , "Joining Date" , "End Date" , "Plan" , "Status" , "Plan Amount" , "Amount Paid"])
+            
             chart_data = df.groupby("Joining Date").size().reset_index(name="Members")
             st.line_chart(chart_data.set_index("Joining Date"))
 
@@ -241,6 +251,10 @@ else:
             st.subheader("Revenue")
             revenue_chart = df.groupby("Joining Date")["Amount Paid"].sum()
             st.line_chart(revenue_chart)
+
+            st.subheader("Due chart")
+            due_chart = df.groupby("Joining Date")["Amount Due"].sum()
+            st.line_chart(due_chart)
 
 
 
