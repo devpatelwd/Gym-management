@@ -109,16 +109,16 @@ else:
         joining_date = st.date_input("Joining Date")
 
         if plan == "1 Month" or plan == "1 Month PT":
-            end_date = today + timedelta(days=31)
+            end_date = joining_date + timedelta(days=31)
 
         elif plan == "3 Month" or plan == "3 Month Student":
-            end_date = today + timedelta(days=92)
+            end_date = joining_date + timedelta(days=92)
 
         elif plan == "6 Month" :
-            end_date = today + timedelta(days=184)
+            end_date = joining_date + timedelta(days=184)
 
         elif plan == "12 Month" :
-            end_date = today + timedelta(days=365)
+            end_date = joining_date + timedelta(days=365)
 
 
         subs_end_date = st.date_input("End date " , end_date)
