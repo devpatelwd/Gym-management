@@ -71,26 +71,26 @@ else:
         checkbox3 = st.checkbox("Get all members having Due Amount")
 
         if checkbox:
-            df = pd.DataFrame(expiring_plan_members , columns=["ID" , "Name" , "Phone" , "Gender" , "Joining Date" , "End Date" , "Plan" , "Status" , "Plan Amount" , "Amount Paid"])
+            df = pd.DataFrame(expiring_plan_members , columns=["ID" , "Name" , "Phone" , "Gender" , "Joining Date" , "End Date" , "Plan" , "Status" , "Plan Amount" , "Amount Paid" , "is_active"])
             df["Amount Due"] = df["Plan Amount"] - df["Amount Paid"]
             style_df = df.style.map(color_status , subset=["Status"])
 
             st.dataframe(style_df , hide_index=True)
             
         elif checkbox2:
-            df = pd.DataFrame(unpaid_members , columns=["ID" , "Name" , "Phone" , "Gender" , "Joining Date" , "End Date" , "Plan" , "Status" , "Plan Amount" , "Amount Paid"])
+            df = pd.DataFrame(unpaid_members , columns=["ID" , "Name" , "Phone" , "Gender" , "Joining Date" , "End Date" , "Plan" , "Status" , "Plan Amount" , "Amount Paid" , "is_active"])
             df["Amount Due"] = df["Plan Amount"] - df["Amount Paid"]
             style_df = df.style.map(color_status ,subset=["Status"])
 
             st.dataframe(style_df , hide_index=True)
         elif checkbox3:
-            df = pd.DataFrame(all_members , columns=["ID" , "Name" , "Phone" , "Gender" , "Joining Date" , "End Date" , "Plan" , "Status" , "Plan Amount" , "Amount Paid"])
+            df = pd.DataFrame(all_members , columns=["ID" , "Name" , "Phone" , "Gender" , "Joining Date" , "End Date" , "Plan" , "Status" , "Plan Amount" , "Amount Paid" , "is_active"])
             df["Amount Due"] = df["Plan Amount"] - df["Amount Paid"]
             df = df[df["Amount Due"] > 0]
             st.dataframe(df[["Name" , "Amount Due"]] , hide_index= True) 
 
         else:
-            df = pd.DataFrame(all_members , columns=["ID" , "Name" , "Phone" , "Gender" , "Joining Date" , "End Date" , "Plan" , "Status" , "Plan Amount" , "Amount Paid"])
+            df = pd.DataFrame(all_members , columns=["ID" , "Name" , "Phone" , "Gender" , "Joining Date" , "End Date" , "Plan" , "Status" , "Plan Amount" , "Amount Paid", "is_active"])
             df["Amount Due"] = df["Plan Amount"] - df["Amount Paid"]
             style_df = df.style.map(color_status , subset=["Status"])
             st.dataframe(style_df , hide_index=True)
